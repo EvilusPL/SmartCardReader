@@ -27,9 +27,11 @@ public class MainFrame extends JFrame {
 	private JTextField terminalID = new JTextField();
 	
 	private GetCardIDButton scGetCardID = new GetCardIDButton("Get Card ID", scReader, terminalInfo, cardInfo, atrInfo, channelInfo, idInfo, terminalID);
+	private ShowCertsFrameButton scShowCerts = new ShowCertsFrameButton("Show certs");
 
 	public MainFrame() {
 		super("Smart Card Reader");
+		setVisible(true);
 		
 		JPanel scLabelPane = new JPanel();
 		JPanel scButtonPane = new JPanel();
@@ -56,10 +58,9 @@ public class MainFrame extends JFrame {
 		scButtonPane.add(terminalIDInfo);
 		scButtonPane.add(terminalID);
 		scButtonPane.add(scGetCardID);
+		scButtonPane.add(scShowCerts);
 		
 		scGetCardID.GetInfo();
-		
-		setVisible(true);
 	}
 
 }

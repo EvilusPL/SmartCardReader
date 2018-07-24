@@ -1,6 +1,14 @@
 package tk.evilus;
 
 import java.awt.EventQueue;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.Provider;
+import java.security.Security;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.smartcardio.ATR;
@@ -11,6 +19,8 @@ import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
+
+import sun.security.pkcs11.SunPKCS11;
 
 public class SmartCardReader {
 
@@ -88,10 +98,49 @@ public class SmartCardReader {
 			card.disconnect(false);
 			return result.toString();
 		} catch (CardException e) {
-			System.out.println("Unable to read card!");
 			return null;
 		}
 	}
+	
+	public KeyStore InitializeCAC(char[] pin) {
+		try
+	       {   
+	         String configName = "card.config";
+	         Provider p = new SunPKCS11(configName);
+	         Security.addProvider(p);
+	         
+	         KeyStore cac = null;
+
+	         cac = KeyStore.getInstance("PKCS11");
+	         cac.load(null, pin);
+	         return cac;
+	      }
+	      catch(Exception ex)
+	      {
+	         return null;
+	      }
+	}
+	
+	public List<X509Certificate[]> ShowInfoAboutCAC(KeyStore ks) throws KeyStoreException, CertificateException
+	   {
+	      Enumeration<String> aliases = ks.aliases();
+	      List<X509Certificate[]> chain = new ArrayList<X509Certificate[]>();
+	      while (aliases.hasMoreElements()) 
+	      {
+	         String alias = aliases.nextElement();
+	         X509Certificate[] cchain = (X509Certificate[]) ks.getCertificateChain(alias);
+
+	         /*System.out.println("Certificate Chain for : " + alias);
+	         for (int i = 0; i < cchain.length; i ++)
+	         {
+	            System.out.println(i + " SubjectDN: " + cchain[i].getSubjectDN());
+	            System.out.println(i + " IssuerDN:  " + cchain[i].getIssuerDN());
+	         }*/
+	         chain.add(cchain);
+	      }
+	      
+	      return chain;
+	   }
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
