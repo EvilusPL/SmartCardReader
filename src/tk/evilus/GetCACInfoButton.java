@@ -36,14 +36,17 @@ public class GetCACInfoButton extends JButton implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		SmartCardReader scReader = new SmartCardReader();
 		KeyStore cac = scReader.InitializeCAC(scPIN.getText().toCharArray());
+		certInfo.setText("");
+		certInfo.append(String.format("cac = %s\n", cac));
 		if (cac != null) {
 			List<X509Certificate[]> chain;
 			try {
-				certInfo.setText("");
 				chain = scReader.ShowInfoAboutCAC(cac);
+				certInfo.append(String.format("chain.size() = %d\n", chain.size()));
 				for (int j=0; j<chain.size(); j++) {
 					certInfo.append(String.format("Chain no. %d\n", j));
 					for (int i=0; i<chain.get(j).length; i++) {
+						certInfo.append(String.format("chain.get(%d).length = %d\n", j, chain.get(j).length));
 						certInfo.append(String.format("Serial number: %s\n", chain.get(j)[i].getSerialNumber()));
 						certInfo.append(String.format("\n"));
 						certInfo.append(String.format("Signing algorithm name: %s\n", chain.get(j)[i].getSigAlgName()));
